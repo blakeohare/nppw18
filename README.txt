@@ -8,3 +8,4 @@ with the PyWeek submission.
 - Angel McLaughlin
 - Brendan Nelson
 - Adrian Cline
+- Christine Sandquist
