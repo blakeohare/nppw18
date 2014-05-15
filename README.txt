@@ -5,3 +5,4 @@ with the PyWeek submission.
 
 - Blake O'Hare
 - Ted Burton (phiofpi@gmail.com)
+- Angel McLaughlin
