@@ -7,3 +7,4 @@ with the PyWeek submission.
 - Ted Burton (phiofpi@gmail.com)
 - Angel McLaughlin
 - Adrian Cline
+- Brendan Nelson
