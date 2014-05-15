@@ -4,3 +4,4 @@ I will eventually convert this document into the README that will be bundled
 with the PyWeek submission. 
 
 - Blake O'Hare
+- Ted Burton (phiofpi@gmail.com)
