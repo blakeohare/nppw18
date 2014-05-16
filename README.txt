@@ -9,3 +9,4 @@ with the PyWeek submission.
 - Brendan Nelson
 - Adrian Cline
 - Christine Sandquist
+- Laura Freer
