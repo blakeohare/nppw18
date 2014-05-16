@@ -298,7 +298,7 @@ class PlayScene:
 			self.allowsword = True
 		
 		if self.allowsword  and sp and self.swordcounter < 0:
-			self.swordcounter = 12
+			self.swordcounter = 6
 			self.swordx = (self.player.x + vec[self.player.dir][0])
 			self.swordy = (self.player.y + vec[self.player.dir][1])
 			
