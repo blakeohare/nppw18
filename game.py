@@ -125,8 +125,8 @@ class Sprite:
 					self.dx = vec[self.dir][0] * .1
 					self.dy = vec[self.dir][1] * .1
 			elif t in ('ogre', 'wolf'):
-				self.dx = sign(player.x - self.x) * .12
-				self.dy = sign(player.y - self.y) * .12
+				self.dx = sign(player.x - self.x) * .08
+				self.dy = sign(player.y - self.y) * .08
 			elif t == 'firespit':
 				foo = c % 150
 				if foo < 40:
@@ -139,6 +139,9 @@ class Sprite:
 						scene.sprites.append(s)
 				else:
 					self.spit = False
+			elif t == 'fireball':
+				if c > 3.5 * 30:
+					self.dead = True
 			elif t == 'bat':
 				foo = c % 90
 				if foo == 0:
