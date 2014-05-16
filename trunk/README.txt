@@ -10,3 +10,4 @@ with the PyWeek submission.
 - Adrian Cline
 - Christine Sandquist
 - Laura Freer
+- Richard Bailey
