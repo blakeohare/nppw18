@@ -3,6 +3,10 @@ import os
 import random
 import math
 
+def dist(a, b):
+	dx = a.x - b.x
+	dy = a.y - b.y
+	return (dx ** 2 + dy ** 2) ** .5
 
 _images = {}
 def get_image(path):
@@ -36,6 +40,7 @@ def load_tiles():
 		t.passable = pas
 		t.img = img
 		tiles[id] = t
+	return tiles
 
 vec = {
 	'n': (0, -1),
@@ -51,7 +56,7 @@ def sign(x):
 def lsh(type, lookup, prim, second, flip):
 	img = get_image('sprites/' + type + '/' + prim + '.png')
 	if img == None:
-		img = get_image('sprites/' + type + '/' + second + '.png')
+		img = lookup[second]
 		if flip:
 			img = pygame.transform.flip(img, True, False)
 	return img
@@ -67,11 +72,13 @@ def load_sprites(type):
 	output['w0'] = lsh(type, output, 'w0', 'e0', True)
 	output['w1'] = lsh(type, output, 'w1', 'e1', True)
 	return output
-	
-def Sprite:
+
+class Sprite:
 	def __init__(self, type, x, y):
 		self.type = type
 		self.dead = False
+		self.spit = False
+		self.moving = False
 		self.x = x
 		self.y = y
 		self.dx = 0
@@ -85,6 +92,9 @@ def Sprite:
 	
 	def update(self, scene, player):
 		
+		
+		
+		self.moving = False
 		if scene.swordcounter < 0:
 			dx = self.x - scene.swordx
 			dy = self.y - scene.swordy
@@ -117,7 +127,7 @@ def Sprite:
 				self.dx = sign(player.x - self.x) * .12
 				self.dy = sign(player.y - self.y) * .12
 			elif t == 'firespit':
-				foo = c % 150:
+				foo = c % 150
 				if c < 40:
 					self.spit = True
 					if c == 20:
@@ -131,7 +141,7 @@ def Sprite:
 			elif t == 'bat':
 				foo = c % 90
 				if foo == 0:
-					self.var = random.random() * 6.28
+					ang = random.random() * 6.28
 					self.pdx = math.cos(ang) * .1
 					self.pdy = math.sin(ang) * .1
 			elif t == 'troll':
@@ -148,7 +158,7 @@ def Sprite:
 		newy = self.y + self.dy + self.pdy
 		
 		outside = newx < 0 or newx >= 16 or newy < 0 or newy >= 14
-		if self.type == fireball and outside:
+		if self.type == 'fireball' and outside:
 			self.dead = True
 			return
 		
@@ -156,10 +166,20 @@ def Sprite:
 		if not outside:
 		
 			t = scene.tiles[int(newx)][int(newy)]
-			if t.passable:
+			if t[1]:
+				if newy > self.y:
+					self.dir = 's'
+				elif newy < self.y:
+					self.dir = 'n'
+				elif newx < self.x:
+					self.dir = 'w'
+				else:
+					self.dir = 'e'
 				
 				self.x = newx
 				self.y = newy
+				self.moving = True
+				
 				
 			else:
 				self.collided = True
@@ -178,7 +198,34 @@ def Sprite:
 			n = '0'
 		img = self.images[self.dir + n]
 		screen.blit(img, (int(self.x * 16 - 8), int(self.y * 16 - 8)))
+class SC: pass
 
+def load_maps():
+	maps = make_grid(10, 6)
+	
+	for file in os.listdir('maps'):
+		path = 'maps' + os.sep + file
+		x, y, music = file.split('.')[0].split('-')
+		col = int(x) - 1
+		row = int(y) - 1
+		music = 'overworld' if music == 'o' else 'dungeon'
+		
+		map = SC()
+		map.col = col
+		map.row = row
+		map.music = music
+		tiles = make_grid(16, 14)
+		c = open(path, 'rt')
+		t = c.read().split('\n')
+		c.close()
+		
+		for y in range(14):
+			for x in range(16):
+				tiles[x][y] = t[y][x]
+		map.tiles = tiles
+		maps[col][row] = map
+	
+	return maps
 class PlayScene:
 	def __init__(self):
 		self.next = self
@@ -186,7 +233,7 @@ class PlayScene:
 		self.tiles = None
 		self.sprites = None
 		self.maps = load_maps()
-		self.swordcount = -1
+		self.swordcounter = -1
 		self.swordx = 0
 		self.swordy = 0
 		self.current = self.maps[0][5]
@@ -226,6 +273,77 @@ class PlayScene:
 	def update(self, sp, dx, dy):
 		if self.tiles == None:
 			self.init_map()
+		print self.player.dir
+		
+		if sp and self.swordcounter < 0:
+			self.swordcounter = 12
+			self.swordx = self.player.x + vec[self.player.dir][0]
+			self.swordy = self.player.y+ vec[self.player.dir][1]
+			
+			
+		if self.swordcounter < 0:
+			self.player.dx = dx * .15
+			self.player.dy = dy * .15
+		
+		ns = []
+		for sprite in self.sprites:
+			sprite.update(self, self.player)
+			if not sprite.dead:
+				ns.append(sprite)
+		self.sprites = ns
+		
+		px = self.player.x
+		py = self.player.y
+		mx = self.current.col
+		my = self.current.row
+		nx = mx
+		ny = my
+		if px < .5:
+			nx -= 1
+			self.player.x = 15.3
+		elif px > 15.5:
+			nx += 1
+			self.player.x = .8
+		elif py < .5:
+			ny -= 1
+			self.player.y = 13.3
+		elif py > 13.5:
+			ny += 1
+			self.player.y = .8
+		if nx != mx or ny != my:
+			self.tiles = None
+			self.current = self.maps[nx][ny]
+		
+			self.init_map()
+		self.swordcounter -= 1
+	
+	def render(self, screen, rc):
+		for y in range(14):
+			for x in range(16):
+				#z = self.tiles[x][y]
+				#if z == None:
+				#	print x, y, z
+				try:
+					screen.blit(self.tiles[x][y][2], (x * 16, y * 16))
+				except:
+					print self.tiles, x, y
+					a = 1 / 0
+		
+		for sprite in self.sprites:
+			sprite.render(screen, rc)
+		
+		if self.swordcounter >= 0:
+			x = self.swordx
+			y = self.swordy
+			w = 16
+			h = 16
+			if self.player.dir in 'ns':
+				x += 6
+				w = 4
+			else:
+				y += 6
+				h = 4
+			
 
 class ImageScene:
 	def __init__(self, type):
@@ -234,7 +352,7 @@ class ImageScene:
 		self.next = self
 		
 	def update(self, sp, dx, dy):
-		self.acceptinput = not sp
+		self.acceptinput = self.acceptinput or ( not sp)
 		if self.acceptinput and sp:
 			if self.type == 'title':
 				self.next = ImageScene('story')
@@ -283,3 +401,5 @@ def main():
 		pygame.display.flip()
 		
 		clk.tick(30)
+		
+main()
