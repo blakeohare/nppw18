@@ -107,7 +107,7 @@ class Sprite:
 		t = self.type
 		if t.endswith('key'):	
 			if dist(player, self) < 1:
-				self.dead
+				self.dead = True
 				scene.keys[t] = True
 		elif self.type == 'player':
 			pass
@@ -177,7 +177,7 @@ class Sprite:
 				if t[0] == '2' and scene.keys.get('greenkey', False): passable = True
 				if t[0] == '3' and scene.keys.get('bluekey', False): 
 					scene.next = ImageScene('victory')
-			if t[1]:
+			if passable:
 				if newy > self.y:
 					self.dir = 's'
 				elif newy < self.y:
