@@ -1,0 +1,50 @@
+Passable tiles:
+L - grass
+I - tile
+G - bridge
+F - flower patch
+M - mushroom patch
+
+Blocking tiles:
+X - brick wall
+W - water
+A - lava
+R - Tree
+D - dead tree
+B - stone block
+H - shrub
+T - torch
+U - stump
+E - statue
+
+1 - red door
+2 - green door
+3 - blue door
+
+Sprites
+! - slime -  moves around every so often
+@ - ogre - chases you
+# - bat - random cardinal direction and pauses
+$ - firespit - creates fireballs every 5 seconds
+  - fireball - moves in a constant direction
+% - troll - paces left and right until obstacle
+& - wolf - chases you
+^ - bug - random cardinal direction and pauses
+
+* - princess - does nothing
+
+{ - redkey 
+} - greenkey
+? - bluekey 
+
+screens
+- screens/title.png
+- screens/story.png
+- screens/death.png
+- screens/victory.png
+
+music
+- music/title.ogg (doubles as victory music)
+- music/overworld.ogg (loops)
+- music/dungeon.ogg (loops)
+- music/death.ogg 
