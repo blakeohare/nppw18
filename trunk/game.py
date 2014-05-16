@@ -83,12 +83,14 @@ class Sprite:
 		self.y = y
 		self.dx = 0
 		self.dy = 0
+		self.collided = False
 		self.dir = 's'
 		self.pdx = 0
 		self.pdy = 0
 		self.var = None
 		self.images = load_sprites(type)
 		self.counter = 0
+		
 	
 	def update(self, scene, player):
 
@@ -97,7 +99,7 @@ class Sprite:
 			dx = self.x - scene.swordx
 			dy = self.y - scene.swordy
 			d = (dx ** 2 + dy ** 2) ** .5
-			print d
+			
 			if d < 1:
 				self.dead = True
 				return
@@ -117,8 +119,8 @@ class Sprite:
 			c = self.counter
 			if t in ('slime', 'bug'):
 				foo = c % 120
-				if c < 60:
-					if c == 0:
+				if foo < 60:
+					if foo == 0:
 						self.dir = random.choice(list('nsew'))
 					self.dx = vec[self.dir][0] * .1
 					self.dy = vec[self.dir][1] * .1
@@ -127,10 +129,10 @@ class Sprite:
 				self.dy = sign(player.y - self.y) * .12
 			elif t == 'firespit':
 				foo = c % 150
-				if c < 40:
+				if foo < 40:
 					self.spit = True
-					if c == 20:
-						s = Sprite('fireball', x, y)
+					if foo == 20:
+						s = Sprite('fireball', self.x, self.y)
 						ang = random.random() * 6.28
 						s.pdx = math.cos(ang) * .2
 						s.pdy  = math.sin(ang) * .2
@@ -166,6 +168,12 @@ class Sprite:
 		if not outside and self.moving:
 		
 			t = scene.tiles[int(newx)][int(newy)]
+			passable = t[1]
+			if not passable and self.type == 'player' and t[0] in '123':
+				if t[0] == '1' and scene.keys.get('redkey', False): passable = True
+				if t[0] == '2' and scene.keys.get('greenkey', False): passable = True
+				if t[0] == '3' and scene.keys.get('bluekey', False): 
+					scene.next = ImageScene('victory')
 			if t[1]:
 				if newy > self.y:
 					self.dir = 's'
@@ -237,8 +245,10 @@ class PlayScene:
 		self.swordcounter = -1
 		self.swordx = 0
 		self.swordy = 0
+		self.keys = {}
 		self.allowsword = False
 		self.current = self.maps[0][5]
+		self.music = None
 	
 	def init_map(self):
 		tilestore = load_tiles()
@@ -269,6 +279,11 @@ class PlayScene:
 						id = 'I'
 				tt = tilestore[id]
 				tiles[x][y] = (id, tt.passable, tt.img)
+		m = map.music
+		if self.music != m:
+			pygame.mixer.music.load('music' + os.sep + m + '.ogg')
+			pygame.mixer.music.play(-1)
+			self.music = m
 		self.tiles = tiles
 		self.sprites = sprites
 		
@@ -349,6 +364,15 @@ class ImageScene:
 		self.type = type
 		self.acceptinput = False
 		self.next = self
+		
+		music = 'title'
+		if type == 'death':
+			music = 'death'
+		elif type == 'story':
+			music = None
+		if music != None:
+			pygame.mixer.music.load('music' + os.sep + music + '.ogg')
+			pygame.mixer.music.play(0)
 		
 	def update(self, sp, dx, dy):
 		self.acceptinput = self.acceptinput or ( not sp)
