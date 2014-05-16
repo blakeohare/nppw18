@@ -1,20 +1,20 @@
 Passable tiles:
-L - grass
+L - grass*
 I - tile
-G - bridge
-F - flower patch
-M - mushroom patch
+G - bridge*
+F - flower patch*
+M - mushroom patch*
 
 Blocking tiles:
 X - brick wall
-W - water
+W - water*
 A - lava
-R - Tree
-D - dead tree
+R - Tree*
+D - dead tree*
 B - stone block
-H - shrub
+H - shrub*
 T - torch
-U - stump
+U - stump*
 E - statue
 
 1 - red door
