@@ -49,13 +49,13 @@ def verify_maps():
 		
 		tiles = make_grid(16, 14)
 		if len(lines) != 14:
-			print file + " does not have 14 lines"
+			print( file + " does not have 14 lines")
 			size_failure = True
 			continue
 		
 		for y in range(14):
 			if len(lines[y]) != 16:
-				print file + " has a row that is not 16 characters"
+				print (file + " has a row that is not 16 characters")
 				size_failure = True
 				break
 		
@@ -68,28 +68,28 @@ def verify_maps():
 				if id in SPRITE_IDS:
 					id = 'I'
 					if x in (0, 15) or y in (0, 13):
-						print file + " has a sprite on the edge (" + str(x) + ", " + str(y) + ")"
+						print( file + " has a sprite on the edge (" + str(x) + ", " + str(y) + ")")
 				if not (id in ALL_TILES):
-					print file + " has unrecognized tile ID (" + str(x) + ", " + str(y) + "): " + id
+					print( file + " has unrecognized tile ID (" + str(x) + ", " + str(y) + "): " + id)
 				tiles[x][y] = (id, id in PASSABLE_TILES)
 		maps[col][row] = tiles
 	if size_failure:
-		print "Size check failed. Skipping rest of verification."
+		print ("Size check failed. Skipping rest of verification.")
 		return
 	
 	for col in range(10):
 		for row in range(6):
 			if maps[col][row] == None:
-				print str(col + 1) + '-' + str(row + 1) + '-?.txt is MISSING!!!!!!!!!!!!!!!!!!!!!!!!!!'
+				print (str(col + 1) + '-' + str(row + 1) + '-?.txt is MISSING!!!!!!!!!!!!!!!!!!!!!!!!!!')
 			else:
 				if col > 0:
 					# verify left column matches map to the left's right column
 					if passability(get_col(maps[col][row], 0)) != passability(get_col(maps[col - 1][row], 15)):
-						print file_lookup[col][row], "left column doesn't match right column of", file_lookup[col - 1][row]
+						print( file_lookup[col][row], "left column doesn't match right column of", file_lookup[col - 1][row])
 				if row > 0:
 					# verify top row matches bottom row of map above it
 					if passability(get_row(maps[col][row], 0)) != passability(get_row(maps[col][row - 1], 13)):
-						print file_lookup[col][row], "top row doesn't match bottom row of", file_lookup[col][row - 1]
+						print( file_lookup[col][row], "top row doesn't match bottom row of", file_lookup[col][row - 1])
 				tiles = maps[col][row]
 				closed = True
 				for x in range(16):
@@ -101,6 +101,6 @@ def verify_maps():
 						if tiles[x][y][1]:
 							closed = False
 				if closed:
-					print file_lookup[col][row], "is completely walled off."
+					print (file_lookup[col][row], "is completely walled off.")
 
 verify_maps()
