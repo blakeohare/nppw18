@@ -91,14 +91,13 @@ class Sprite:
 		self.counter = 0
 	
 	def update(self, scene, player):
-		
-		
-		
+
 		self.moving = False
-		if scene.swordcounter < 0:
+		if scene.swordcounter >= 0 and not (self.type in ('player', 'redkey', 'bluekey', 'greenkey')):
 			dx = self.x - scene.swordx
 			dy = self.y - scene.swordy
-			d = (dx ** 2 + dy ** 2)
+			d = (dx ** 2 + dy ** 2) ** .5
+			print d
 			if d < 1:
 				self.dead = True
 				return
@@ -162,8 +161,9 @@ class Sprite:
 			self.dead = True
 			return
 		
+		self.moving = self.dx != 0 or self.dy != 0 or self.pdx != 0 or self.pdy != 0
 		self.collided = False
-		if not outside:
+		if not outside and self.moving:
 		
 			t = scene.tiles[int(newx)][int(newy)]
 			if t[1]:
@@ -226,6 +226,7 @@ def load_maps():
 		maps[col][row] = map
 	
 	return maps
+	
 class PlayScene:
 	def __init__(self):
 		self.next = self
@@ -236,6 +237,7 @@ class PlayScene:
 		self.swordcounter = -1
 		self.swordx = 0
 		self.swordy = 0
+		self.allowsword = False
 		self.current = self.maps[0][5]
 	
 	def init_map(self):
@@ -273,12 +275,14 @@ class PlayScene:
 	def update(self, sp, dx, dy):
 		if self.tiles == None:
 			self.init_map()
-		print self.player.dir
 		
-		if sp and self.swordcounter < 0:
+		if not sp:
+			self.allowsword = True
+		
+		if self.allowsword  and sp and self.swordcounter < 0:
 			self.swordcounter = 12
-			self.swordx = self.player.x + vec[self.player.dir][0]
-			self.swordy = self.player.y+ vec[self.player.dir][1]
+			self.swordx = (self.player.x + vec[self.player.dir][0])
+			self.swordy = (self.player.y + vec[self.player.dir][1])
 			
 			
 		if self.swordcounter < 0:
@@ -320,21 +324,15 @@ class PlayScene:
 	def render(self, screen, rc):
 		for y in range(14):
 			for x in range(16):
-				#z = self.tiles[x][y]
-				#if z == None:
-				#	print x, y, z
-				try:
-					screen.blit(self.tiles[x][y][2], (x * 16, y * 16))
-				except:
-					print self.tiles, x, y
-					a = 1 / 0
+				screen.blit(self.tiles[x][y][2], (x * 16, y * 16))
+				
 		
 		for sprite in self.sprites:
 			sprite.render(screen, rc)
 		
 		if self.swordcounter >= 0:
-			x = self.swordx
-			y = self.swordy
+			x = int(16 * self.swordx) - 8
+			y = int(16 * self.swordy) - 8
 			w = 16
 			h = 16
 			if self.player.dir in 'ns':
@@ -343,6 +341,7 @@ class PlayScene:
 			else:
 				y += 6
 				h = 4
+			pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(x, y, w, h))
 			
 
 class ImageScene:
@@ -364,8 +363,6 @@ class ImageScene:
 	def render(self, screen, rc):
 		img = get_image('screens/' + self.type + '.png')
 		screen.blit(img, (0, 0))
-
-
 
 def main():
 	pygame.init()
